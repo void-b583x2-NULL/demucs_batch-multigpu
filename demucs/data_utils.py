@@ -34,8 +34,9 @@ class DemucsDataSet:
         self.audiolength = audiolength
     
     def __getitem__(self, idx):
+        # if idx >= len(self.file_list):
+            
         fn = self.file_list[idx]
-
         wav = load_track(fn, self.audio_channels, self.samplerate)
 
         if len(wav.shape) == 1 :
@@ -83,5 +84,7 @@ def load_track(track, audio_channels, samplerate):
               "Maybe it is not a supported file format? ")
         for backend, error in errors.items():
             print(f"When trying to load using {backend}, got the following error: {error}")
-        sys.exit(1)
+            print("Will return a zero-tensor equal to given channels and samplerate * 10 seconds.")
+        # sys.exit(1)
+        wav = th.zeros(audio_channels, samplerate * 10)
     return wav

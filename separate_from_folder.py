@@ -35,7 +35,7 @@ def main():
     parser.add_argument("-l",
                         "--audiolength",
                         type = int,
-                        default=1324800,
+                        default=10,
                         help="Length of the audio(sr) based on model's sr. (44100 based default)")
     parser.add_argument("-d",
                         "--device",

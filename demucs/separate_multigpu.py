@@ -22,6 +22,7 @@ from .pretrained import get_model_from_args, add_model_flags, ModelLoadingError
 from .data_utils import get_size, DemucsDataSet, load_track
 
 import gc
+import os
 
 def get_parser():
     parser = argparse.ArgumentParser("demucs.separate",
@@ -128,6 +129,9 @@ def get_parser():
 def main(opts=None):
     parser = get_parser()
     args = parser.parse_args(opts)
+    print(args)
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 
     try:
         model = get_model_from_args(args)
@@ -231,7 +235,7 @@ def main(opts=None):
                                                 stem=args.stem, ext=ext)
                 stem.parent.mkdir(parents=True, exist_ok=True)
                 source = sources.pop(model.module.sources.index(args.stem))
-                if args.sample_rate is not None :
+                if args.sample_rate is not None and args.sample_rate != model.module.samplerate:
                     source = librosa.resample(source.detach().cpu().numpy(), orig_sr = model.module.samplerate, target_sr = args.sample_rate)
                 save_audio(th.Tensor(source), str(stem), **kwargs)
                 # Warning : after poping the stem, selected stem is no longer in the list 'sources'
@@ -245,8 +249,8 @@ def main(opts=None):
                 if args.sample_rate is not None :
                     other_stem = librosa.resample(other_stem.detach().cpu().numpy(), orig_sr = model.module.samplerate, target_sr = args.sample_rate)
                 save_audio(th.Tensor(other_stem), str(stem), **kwargs)
-        del b_sources, sources, other_stem, batch
-        gc.collect()
+        # del b_sources, sources, other_stem, batch
+        # gc.collect()
 
 if __name__ == "__main__":
     main()
